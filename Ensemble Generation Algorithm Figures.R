@@ -38,16 +38,21 @@ coords = suppressWarnings(st_coordinates(st_centroid(shp)))
 # State to graph figure (2 panels)
 #==================================
 
-png("state_graph_figure.png", width = 2000, height = 1100, res = 150, bg = "transparent")
-par(mfrow = c(1, 2), bg = NA, mar = c(0, 0, 2, 0)) # small top margin so title sits close
+bb = st_bbox(shp) # bounding box, used below to size panels to the map's true shape
+asp = as.numeric((bb["ymax"] - bb["ymin"]) / (bb["xmax"] - bb["xmin"])) # height:width ratio of the map
+pw = 900 # base panel width, px
+ph = round(pw * asp) # panel height that matches the map's aspect, so there is no blank space above/below it
+
+png("state_graph_figure.png", width = pw * 2, height = ph + 40, res = 150, pointsize = 15, bg = "transparent")
+par(mfrow = c(1, 2), bg = NA, mar = c(0, 0, 1.6, 0)) # small top margin so title sits close
 
 # Panel A: the state / precincts
 plot(st_geometry(shp), col = "cornflowerblue", border = "gray30")
-title(main = "(A) State", col.main = "black", line = 0.3)
+title(main = "(A) State", col.main = "black", line = 0.2, cex.main = 1.15)
 
 # Panel B: the underlying adjacency graph, overlaid on faint boundaries
 plot(st_geometry(shp), col = NA, border = "gray30")
-title(main = "(B) Graph", col.main = "black", line = 0.3)
+title(main = "(B) Dual Graph", col.main = "black", line = 0.2, cex.main = 1.15)
 plot(g, layout = coords, add = TRUE, rescale = FALSE, # layout = coords places nodes at real centroids, not an auto layout
      vertex.size = 1, vertex.color = "black", vertex.label = NA,
      edge.color = "blue")
